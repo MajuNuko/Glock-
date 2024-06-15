@@ -9,7 +9,7 @@ getgenv().AimPart = "UpperTorso" -- For R15 Games: {UpperTorso, LowerTorso, Huma
     getgenv().PredictionVelocity = 9.5
     getgenv().CheckIfJumped = true
     getgenv().Smoothness = true
-    getgenv().SmoothnessAmount =  0.00016374
+    getgenv().SmoothnessAmount =  0.11225533
 
     local Players, Uis, RService, SGui = game:GetService"Players", game:GetService"UserInputService", game:GetService"RunService", game:GetService"StarterGui";
     local Client, Mouse, Camera, CF, RNew, Vec3, Vec2 = Players.LocalPlayer, Players.LocalPlayer:GetMouse(), workspace.CurrentCamera, CFrame.new, Ray.new, Vector3.new, Vector2.new;
@@ -168,6 +168,202 @@ getgenv().AimPart = "UpperTorso" -- For R15 Games: {UpperTorso, LowerTorso, Huma
        end
     end
 end)
+-- Do not Mess with Below Unless u know how to Code --
+local function API_Check()
+    if Drawing == nil then
+        return "No"
+    else
+        return "Yes"
+    end
+end
+
+local Find_Required = API_Check()
+
+if Find_Required == "No" then
+    game:GetService("StarterGui"):SetCore("SendNotification",{
+        Title = "GlockEsp";
+        Text = "ESP script could not be loaded because your exploit is unsupported.";
+        Duration = math.huge;
+        Button1 = "OK"
+    })
+
+    return
+end
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Camera = workspace.CurrentCamera
+
+local Typing = false
+
+_G.SendNotifications = true   -- If set to true then the script would notify you frequently on any changes applied and when loaded / errored. (If a game can detect this, it is recommended to set it to false)
+_G.DefaultSettings = false   -- If set to true then the ESP script would run with default settings regardless of any changes you made.
+
+_G.TeamCheck = false   -- If set to true then the script would create ESP only for the enemy team members.
+
+_G.ESPVisible = true   -- If set to true then the ESP will be visible and vice versa.
+_G.TextColor = Color3.fromRGB(40, 40,250)   -- The color that the boxes would appear as.
+_G.TextSize = 14   -- The size of the text.
+_G.Center = true   -- If set to true then the script would be located at the center of the label.
+_G.Outline = true   -- If set to true then the text would have an outline.
+_G.OutlineColor = Color3.fromRGB(0, 0, 0)   -- The outline color of the text.
+_G.TextTransparency = 0.7   -- The transparency of the text.
+_G.TextFont = Drawing.Fonts.UI   -- The font of the text. (UI, System, Plex, Monospace) 
+
+_G.DisableKey = Enum.KeyCode.Q   -- The key that disables / enables the ESP.
+
+local function CreateESP()
+    for _, v in next, Players:GetPlayers() do
+        if v.Name ~= Players.LocalPlayer.Name then
+            local ESP = Drawing.new("Text")
+
+            RunService.RenderStepped:Connect(function()
+                if workspace:FindFirstChild(v.Name) ~= nil and workspace[v.Name]:FindFirstChild("HumanoidRootPart") ~= nil then
+                    local Vector, OnScreen = Camera:WorldToViewportPoint(workspace[v.Name]:WaitForChild("Head", math.huge).Position)
+
+                    ESP.Size = _G.TextSize
+                    ESP.Center = _G.Center
+                    ESP.Outline = _G.Outline
+                    ESP.OutlineColor = _G.OutlineColor
+                    ESP.Color = _G.TextColor
+                    ESP.Transparency = _G.TextTransparency
+                    ESP.Font = _G.TextFont
+
+                    if OnScreen == true then
+                        local Part1 = workspace:WaitForChild(v.Name, math.huge):WaitForChild("HumanoidRootPart", math.huge).Position
+                        local Part2 = workspace:WaitForChild(Players.LocalPlayer.Name, math.huge):WaitForChild("HumanoidRootPart", math.huge).Position or 0
+                        local Dist = (Part1 - Part2).Magnitude
+                        ESP.Position = Vector2.new(Vector.X, Vector.Y - 25)
+                        ESP.Text = ("("..tostring(math.floor(tonumber(Dist)))..") "..v.Name.." ["..workspace[v.Name].Humanoid.Health.."]")
+                        if _G.TeamCheck == true then 
+                            if Players.LocalPlayer.Team ~= v.Team then
+                                ESP.Visible = _G.ESPVisible
+                            else
+                                ESP.Visible = false
+                            end
+                        else
+                            ESP.Visible = _G.ESPVisible
+                        end
+                    else
+                        ESP.Visible = false
+                    end
+                else
+                    ESP.Visible = false
+                end
+            end)
+
+            Players.PlayerRemoving:Connect(function()
+                ESP.Visible = false
+            end)
+        end
+    end
+
+    Players.PlayerAdded:Connect(function(Player)
+        Player.CharacterAdded:Connect(function(v)
+            if v.Name ~= Players.LocalPlayer.Name then 
+                local ESP = Drawing.new("Text")
+    
+                RunService.RenderStepped:Connect(function()
+                    if workspace:FindFirstChild(v.Name) ~= nil and workspace[v.Name]:FindFirstChild("HumanoidRootPart") ~= nil then
+                        local Vector, OnScreen = Camera:WorldToViewportPoint(workspace[v.Name]:WaitForChild("Head", math.huge).Position)
+    
+                        ESP.Size = _G.TextSize
+                        ESP.Center = _G.Center
+                        ESP.Outline = _G.Outline
+                        ESP.OutlineColor = _G.OutlineColor
+                        ESP.Color = _G.TextColor
+                        ESP.Transparency = _G.TextTransparency
+    
+                        if OnScreen == true then
+                            local Part1 = workspace:WaitForChild(v.Name, math.huge):WaitForChild("HumanoidRootPart", math.huge).Position
+                        local Part2 = workspace:WaitForChild(Players.LocalPlayer.Name, math.huge):WaitForChild("HumanoidRootPart", math.huge).Position or 0
+                            local Dist = (Part1 - Part2).Magnitude
+                            ESP.Position = Vector2.new(Vector.X, Vector.Y - 25)
+                            ESP.Text = ("("..tostring(math.floor(tonumber(Dist)))..") "..v.Name.." ["..workspace[v.Name].Humanoid.Health.."]")
+                            if _G.TeamCheck == true then 
+                                if Players.LocalPlayer.Team ~= Player.Team then
+                                    ESP.Visible = _G.ESPVisible
+                                else
+                                    ESP.Visible = false
+                                end
+                            else
+                                ESP.Visible = _G.ESPVisible
+                            end
+                        else
+                            ESP.Visible = false
+                        end
+                    else
+                        ESP.Visible = false
+                    end
+                end)
+    
+                Players.PlayerRemoving:Connect(function()
+                    ESP.Visible = false
+                end)
+            end
+        end)
+    end)
+end
+
+if _G.DefaultSettings == true then
+    _G.TeamCheck = false
+    _G.ESPVisible = true
+    _G.TextColor = Color3.fromRGB(250, 40, 40)
+    _G.TextSize = 14
+    _G.Center = true
+    _G.Outline = false
+    _G.OutlineColor = Color3.fromRGB(3, 0, 182)
+    _G.DisableKey = Enum.KeyCode.Q
+    _G.TextTransparency = 0.75
+end
+
+UserInputService.TextBoxFocused:Connect(function()
+    Typing = true
+end)
+
+UserInputService.TextBoxFocusReleased:Connect(function()
+    Typing = false
+end)
+
+UserInputService.InputBegan:Connect(function(Input)
+    if Input.KeyCode == _G.DisableKey and Typing == false then
+        _G.ESPVisible = not _G.ESPVisible
+        
+        if _G.SendNotifications == true then
+            game:GetService("StarterGui"):SetCore("SendNotification",{
+                Title = "GlockEsp";
+                Text = "Esp Is Now  "..tostring(_G.ESPVisible)..".";
+                Duration = 5;
+            })
+        end
+    end
+end)
+
+local Success, Errored = pcall(function()
+    CreateESP()
+end)
+
+if Success and not Errored then
+    if _G.SendNotifications == true then
+        game:GetService("StarterGui"):SetCore("SendNotification",{
+            Title = "GlockEsp";
+            Text = "ESP script has successfully loaded.";
+            Duration = 5;
+        })
+    end
+elseif Errored and not Success then
+    if _G.SendNotifications == true then
+        game:GetService("StarterGui"):SetCore("SendNotification",{
+            Title = "GlockEsp";
+            Text = "ESP script has errored while loading, please check the developer console! (F9)";
+            Duration = 5;
+        })
+    end
+    TestService:Message("The ESP script has errored Dm Glock#3383 :")
+    warn(Errored)
+    print("!! IF THE ERROR IS A FALSE POSITIVE (says that a player cannot be found) THEN DO NOT BOTHER !!")
+end
 wait(3)
 
 game:GetService("StarterGui"):SetCore("SendNotification",{
@@ -175,10 +371,17 @@ game:GetService("StarterGui"):SetCore("SendNotification",{
 	Text = "Executed!", -- Required
     Icon = "rbxassetid://17849728202";
 })
-wait(5)
+wait(6)
 
 game:GetService("StarterGui"):SetCore("SendNotification",{
 	Title = "Glock Aimlock", -- Required
 	Text = "Press E To Activate", -- Required
+    Icon = "rbxassetid://17849728202";
+})
+wait(9)
+
+game:GetService("StarterGui"):SetCore("SendNotification",{
+	Title = "Glockesp", -- Required
+	Text = "Press Q To Activate Esp!", -- Required
     Icon = "rbxassetid://17849728202";
 })
